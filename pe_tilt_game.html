@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PE Tilt Game</title>
+<style>
+body { font-family: Arial; text-align: center; background: #1e1e2f; color: white; }
+button { padding: 15px 30px; font-size: 20px; cursor: pointer; }
+.option { margin: 20px; font-size: 20px; }
+#arrows { font-size: 60px; margin: 20px; }
+.active { color: yellow; }
+</style>
+</head>
+
+<body>
+
+<h1>PE Tilt Game</h1>
+<button id="startBtn">Start Game</button>
+
+<div id="game" style="display:none;">
+  <h2 id="question"></h2>
+  <div class="option" id="leftOpt"></div>
+  <div class="option" id="rightOpt"></div>
+  <div id="arrows">
+    <span id="leftArrow">⬅️</span>
+    <span id="rightArrow">➡️</span>
+  </div>
+  <p id="timer"></p>
+</div>
+
+<div id="end" style="display:none;">
+  <h2>🎉 Congratulations!</h2>
+  <p id="score"></p>
+</div>
+
+<script>
+let questions = [
+["If it is sunny, he will play basketball outside.","If it is rainy, he will play basketball inside.",0],
+["If it is windy, she will fly a kite.","If it is stormy, she will swim.",0],
+["If it is sunny, they will play football.","If it is rainy, they will play football outside.",0],
+["If it is rainy, he will play badminton inside.","If it is sunny, he will play badminton inside.",0],
+["If it is cloudy, she will jog outside.","If it is stormy, she will jog outside.",0],
+["If it is sunny, he will catch the ball outside.","If it is rainy, he will catch the ball outside.",0],
+["If it is rainy, they will exercise indoors.","If it is sunny, they will exercise indoors.",0],
+["If it is sunny, she will run in the park.","If it is stormy, she will run in the park.",0],
+["If it is windy, he will play soccer outside.","If it is stormy, he will play soccer outside.",0],
+["If it is rainy, she will do yoga indoors.","If it is sunny, she will do yoga indoors.",0]
+];
+
+let current = 0;
+let score = 0;
+let timer;
+
+document.getElementById("startBtn").onclick = () => {
+  document.getElementById("startBtn").style.display = "none";
+  document.getElementById("game").style.display = "block";
+  loadQuestion();
+};
+
+function loadQuestion() {
+  if (current >= questions.length) return endGame();
+
+  let q = questions[current];
+  document.getElementById("question").innerText = "Choose the correct sentence:";
+  document.getElementById("leftOpt").innerText = "A: " + q[0];
+  document.getElementById("rightOpt").innerText = "B: " + q[1];
+
+  startTimer();
+}
+
+function startTimer() {
+  let time = 5;
+  document.getElementById("timer").innerText = "Time: " + time;
+
+  timer = setInterval(() => {
+    time--;
+    document.getElementById("timer").innerText = "Time: " + time;
+    if (time === 0) {
+      clearInterval(timer);
+      nextQuestion();
+    }
+  }, 1000);
+}
+
+function answer(side) {
+  clearInterval(timer);
+  let correct = questions[current][2];
+  if (side === correct) {
+    score++;
+    playSound(true);
+  } else {
+    playSound(false);
+  }
+  nextQuestion();
+}
+
+function nextQuestion() {
+  current++;
+  loadQuestion();
+}
+
+function endGame() {
+  document.getElementById("game").style.display = "none";
+  document.getElementById("end").style.display = "block";
+  document.getElementById("score").innerText = "Your Score: " + score + " / 10";
+}
+
+function playSound(correct) {
+  let audio = new Audio(correct ? 
+    "https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" :
+    "https://actions.google.com/sounds/v1/cartoon/boing.ogg");
+  audio.play();
+}
+
+// SIMPLE keyboard control instead of webcam (stable version)
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft") {
+    document.getElementById("leftArrow").classList.add("active");
+    answer(0);
+  }
+  if (e.key === "ArrowRight") {
+    document.getElementById("rightArrow").classList.add("active");
+    answer(1);
+  }
+});
+</script>
+
+</body>
+</html>
